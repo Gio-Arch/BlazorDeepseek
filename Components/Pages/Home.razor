@@ -1,7 +1,66 @@
 ﻿@page "/"
+@using BlazorDeepseek.Services
+@inject DeepSeekService serviceProvider
+@attribute [StreamRendering]
+@rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
+<style>
+	.background {
+/* 		background-image: linear-gradient(180deg, #0B2027 0%, #70A9A1 70%);
+		color:#fdfdfd;
+ */	}
+</style>
 
-<h1>Hello, world!</h1>
+<div class="container-fluid">
+	<div class="row background">
+		<div class="col">
+			@if (isStartWorking)
+			{
+				@if (deepseek == null)
+				{
+					<span>
+						Loading...
+					</span>
+				}
+				else
+				{
+					@((MarkupString)deepseek)
+				}
+			}
+			else
+			{
+				<span>
+					<h1>Hello, world!</h1>
+					Welcome to your new app.
+				</span>
+			}
+		</div>
+	</div>
+	<div class="row">
+		<div class="col">
+			<input type="text" @bind-value="@textVal" />
+		</div>
+		<div class="col">
+			<button class="btn btn-primary" @onclick="AskDeepseek">Click me</button>
+		</div>
+	</div>
+</div>
 
-Welcome to your new app.
+
+@code
+{
+	private string? textVal,
+	deepseek;
+	private bool isStartWorking = false;
+
+
+	public async Task AskDeepseek()
+	{
+		isStartWorking = true;
+		if (!string.IsNullOrWhiteSpace(textVal))
+		{
+			deepseek = await serviceProvider.SendMessageAsync(textVal);
+		}
+	}
+}
